@@ -21,7 +21,7 @@
     "react-native-gesture-handler": "^1.10.3",
     "react-native-image-crop-picker": "^0.36.2",
     "react-native-localization": "^2.1.7",
-    "react-native-modalbox": "^1.1.0",
+    "react-native-modalbox": "^2.0.2",
     "react-native-safe-area-context": "^3.2.0",
     "react-native-screens": "^3.3.0",
     "react-native-size-matters": "^0.4.0",

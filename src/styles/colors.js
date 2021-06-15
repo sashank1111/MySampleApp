@@ -19,6 +19,8 @@ export const colors = {
     CURRENT_STATUS: 'rgba(255,155,45,1)',
     black:"#000000",
     nearToBlack: "#051A1A",
+    TRANSPARENT: 'transparent',
+
     
     ONBOARD_OPACITY:"rgba(0,0,0,0.56)",
 

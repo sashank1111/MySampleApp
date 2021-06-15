@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { View, Text, Image, ImageBackground, ScrollView, Pressable, Alert } from 'react-native';
+import { View, Text, Image, ImageBackground, SafeAreaView, ScrollView, Pressable, Alert } from 'react-native';
 import styles from './ForumScreenStyle';
+import { colors } from '../../styles/colors';
 import { showSuccess, showError } from '../../utils/helperFunctions';
 import { Images } from '../../constants/ImagesPath';
 import { Button } from '../../components/molecules/Button';
@@ -9,6 +10,8 @@ import actions from '../../redux/actions';
 import { FlatList, TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import Loader from '../../utils/loader';
 import { spacing } from '../../styles/spacing';
+import ImagePicker from 'react-native-image-crop-picker';
+import Modalbox from 'react-native-modalbox'
 
 //let deviceWidth = Dimensions.get('window').width
 
@@ -33,8 +36,11 @@ export default class Forum extends Component {
             selectedImages: [],
             selectedImage: [],
             v3Visible: false,
-             SlotId: this.props.route.params.Id,
-            data: ''
+            SlotId: this.props.route.params.Id,
+            data: '',
+            fileName: '',
+            fileType: '',
+
         }
     }
 
@@ -88,7 +94,7 @@ export default class Forum extends Component {
 
                     this.userLogin();
 
- 
+
                 } else {
                     showError('Please Enter PhoneNumber');
                 }
@@ -128,7 +134,7 @@ export default class Forum extends Component {
 
     errorMethod = error => {
         this.setState({ isloading: false });
-         showError(error.message);
+        showError(error.message);
     };
 
 
@@ -140,168 +146,183 @@ export default class Forum extends Component {
 
     _onLoadError = () => {
         if (Platform.OS == 'android') {
-          ToastAndroid.show('Network Fail Error', ToastAndroid.SHORT);
+            ToastAndroid.show('Network Fail Error', ToastAndroid.SHORT);
         }
-    
-        this.setState({
-          loadingImage: false
-        })
-      }
 
-      showCamera() {
+        this.setState({
+            loadingImage: false
+        })
+    }
+
+    showCamera() {
+        console.log('hihihihih')
         ImagePicker.openCamera({
-          // width: 300,
-          // height: 400,
-          // cropping: true,
         }).then(image => {
-          console.log(image, 'cameracoming');
-          //this.setState({ selectedImages: image })
-    
-          var res = image.path.split("/");
-          console.log(res, 'response-->')
-    
-          var img = {
-            name: res[res.length - 1],
-            type: image.mime,
-            uri: image.path
-    
-          }
-          this.setState({
-            selectedImage: img,
-            selectedImages: image
-          })
-          console.log(img, 'yesno')
-          console.log(image, 'yesnoT')
-    
+            console.log(image, 'cameracoming');
+            //this.setState({ selectedImages: image })
+
+            var res = image.path.split("/");
+            console.log(res, 'response-->')
+
+            var img = {
+                name: res[res.length - 1],
+                type: image.mime,
+                uri: image.path
+
+            }
+            this.setState({
+                selectedImage: img,
+                selectedImages: image
+            })
+            console.log(img, 'yesno')
+            console.log(image, 'yesnoT')
+
         });
-    
-      }
-    
-      showGallery() {
+
+    }
+
+    showGallery() {
+        console.log('hahahaahahah')
         ImagePicker.openPicker({
-          //multiple:true
+            //multiple:true
         }).then(image => {
-          console.log(image, 'images-----=-=-=>')
-          var res = image.path.split("/");
-          console.log(res, 'response---||')
-    
-          var img = {
-            name: res[res.length - 1],
-            type: image.mime,
-            uri: image.path
-          }
-          this.setState({
-            selectedImage: img,
-            selectedImages: image
-          })
-          console.log(img, 'imgg')
-          console.log(image, 'image-->')
+            console.log(image, 'images-----=-=-=>')
+            var res = image.path.split("/");
+            console.log(res, 'response---||')
+
+            var img = {
+                name: res[res.length - 1],
+                type: image.mime,
+                uri: image.path
+            }
+            this.setState({
+                selectedImage: img,
+                selectedImages: image
+            })
+            console.log(img, 'imgg')
+            console.log(image, 'image-->')
         });
-      }
+    }
 
 
     render() {
         const { isloading } = this.state;
         return (
-            <View style={{
-                flex: 1,
+            <SafeAreaView style={{ flex: 1 }}>
+
+                <Modalbox isOpen={this.state.v3Visible} style={styles.modalBoxView}
+                    backdropPressToClose={false}
+                >
+                    <View style={{ height: 250, width: "100%", justifyContent: 'space-evenly', alignItems: 'center' }}>
+                        <TouchableOpacity onPress={() => { this.showGallery() }} >
+                            <Text style={{ fontSize: 20, color: 'blue', fontWeight: "500" }}>Choose From Gallery</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => { this.showCamera() }}>
+                            <Text style={{ fontSize: 20, color: 'blue', fontWeight: "500" }}>Open Camera</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => {
+                                this.setState({
+                                    v3Visible: false,
+                                })
+                            }}
+                        >
+                            <Text style={{ fontSize: 17, fontWeight: "500", color: 'black' }}>
+                                Cancel
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </Modalbox>
 
 
-            }}>
-
-                 
 
                 <ImageBackground source={Images.appbackgroundImage} style={{
                     flex: 1,
                     resizeMode: "cover",
                 }}>
 
+                    {this.state.avatarSource == null ?
+                        (<View style={{ flexDirection: 'row', justifyContent: 'center', alignSelf: 'center', marginTop: 20 }}>
+                            {this.state.selectedImages.path == null ?
+                                <Image source={Images.profile_img} style={[styles.profileImage]} />
+                                :
+                                <Image source={{ uri: this.state.selectedImages.path }}
+                                    style={[styles.profilesImage]} />
 
- 
+                            }
 
+                             <View style={{ justifyContent: 'flex-end', marginBottom: 10, right: 40 }}>
+                                <TouchableOpacity
+                                    activeOpacity={0.7}
+                                    onPress={() => this.ModalVisible()}
+                                     style={styles.touchViewModal}
+                                    >
+                                    <Image style={{ width: 30, height: 30, tintColor: colors.BLACK, backgroundColor: '#ff5c5c' }}
+                                        source={Images.cameraIcon} />
+                                </TouchableOpacity>
+                            </View>
+                        </View>)
+                        :
+                        (
+                            <View style={{ flexDirection: 'row', justifyContent: 'center', alignSelf: 'center', bottom: 10 }}>
+                                <Image source={this.state.avatarSource}
+                                    style={{
+                                        height: 140,
+                                        width: 140,
+                                        borderRadius: 140 / 2,
+                                    }}
 
+                                    onError={this._onLoadError}
+                                />
+                                <View style={{ justifyContent: 'flex-end', marginBottom: 10, right: 40 }}>
 
+                                </View>
+                            </View>
+                        )}
 
-                    <View style={{ flex: 1, justifyContent: 'center', alignContent: 'center' }}>
-
-
+                    <View style={styles.textInputMainView}>
                         <View style={{ alignItems: 'center' }}>
-
                         </View>
-                        <View style={{ margin: 10 }}>
+                        <View style={styles.textInputView}>
                             <TextInput
-                                style={{
-                                    height: 50,
-                                    // color: 'white',
-                                    paddingLeft: 15,
-                                    borderColor: 'grey',
-                                    borderWidth: 1,
-                                    borderRadius: 5
-                                }}
-
+                                style={styles.textInput}
                                 onChangeText={userFirstName => this.setState({ userFirstName: userFirstName })}
-                                //keyboardType="email-address"
                                 defaultValue={this.state.data.firstName}
-                                 placeholder={'FirstName'}
+                                placeholder={'FirstName'}
                                 placeholderTextColor={'grey'}
-                            //backgroundColor={colors.TEXTBOX_BACKGROUND}
                             />
                         </View>
-                        <View
-                            style={{ margin: 10 }}
-                        >
+                        <View style={styles.textInputView}>
                             <TextInput
-                                style={{
-                                    height: 50,
-                                    // color: 'white',
-                                    paddingLeft: 15,
-                                    borderColor: 'grey',
-                                    borderWidth: 1,
-                                    borderRadius: 5
-                                }}
+                                style={styles.textInput}
                                 onChangeText={userLastName => this.setState({ userLastName: userLastName })}
-                                // keyboardType="number"
                                 defaultValue={this.state.data.lastName}
                                 placeholder={'LastName'}
                                 placeholderTextColor={'grey'}
-                            //backgroundColor={colors.TEXTBOX_BACKGROUND}
                             />
                         </View>
 
-                        <View
-                            style={{ margin:10  }}
-                        >
+                        <View style={styles.textInputView}>
                             <TextInput
-                                style={{
-                                    height: 50,
-                                    // color: 'white',
-                                    paddingLeft: 15,
-                                    borderColor: 'black',
-                                    borderWidth: 1,
-                                    borderRadius: 5,
-                                    color: 'black'
-                                }}
+                                style={styles.textInput}
                                 onChangeText={userPhoneNo => this.setState({ userPhoneNo: userPhoneNo })}
                                 defaultValue={this.state.data.phone}
                                 keyboardType="number"
                                 placeholder={'PhoneNo'}
                                 placeholderTextColor={'grey'}
-                            //backgroundColor={colors.TEXTBOX_BACKGROUND}
                             />
                         </View>
-                        <Button btnStyle={{ backgroundColor: '#ff5c5c', borderRadius: 5, margin: 10 }} btnText={strings.save}
+                        <Button btnStyle={styles.buttonStyle} btnText={strings.save}
                             textStyle={styles.loginBtn} onPress={() => { this.login() }}
                         />
-                        < Button btnStyle={{ backgroundColor: '#ff5c5c', borderRadius: 5, margin: 10 }} btnText={strings.cancel}
-                            textStyle={styles.loginBtn}  onPress={() => this.props.navigation.goBack()}
+                        < Button btnStyle={styles.buttonStyle} btnText={strings.cancel}
+                            textStyle={styles.loginBtn} onPress={() => this.props.navigation.goBack()}
                         />
-
-
 
                     </View>
                 </ImageBackground>
                 <Loader loading={isloading} />
-            </View>
+            </SafeAreaView>
         )
     }
 }
