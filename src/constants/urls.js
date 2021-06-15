@@ -14,7 +14,8 @@ const urls = {
     filterProject: '/user/filterProject',
     changePassword: '/user/changePassword',
     notificationList: '/user/notificationList',
-    statistics: '/users/statistics'
+    statistics: '/users/statistics' 
+    
 };
 
 export { urls };
